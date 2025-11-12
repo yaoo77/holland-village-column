@@ -23,14 +23,14 @@ echo "【文字数チェック】"
 CHAR_COUNT=$(sed -n '/【今日の金融トピック】/,/#HVMC_Morningcolumn/p' "$COLUMN_FILE" | grep -v '#HVMC_Morningcolumn' | tr -d '\n' | wc -m)
 echo "  文字数: ${CHAR_COUNT}文字"
 
-if [ $CHAR_COUNT -lt 600 ]; then
-    echo "  ❌ 文字数不足（600文字未満）"
+if [ $CHAR_COUNT -lt 500 ]; then
+    echo "  ❌ 文字数不足（500文字未満）"
     PASS=false
-elif [ $CHAR_COUNT -gt 800 ]; then
-    echo "  ❌ 文字数超過（800文字超）"
+elif [ $CHAR_COUNT -gt 580 ]; then
+    echo "  ❌ 文字数超過（580文字超）"
     PASS=false
 else
-    echo "  ✅ 文字数OK（600-800文字）"
+    echo "  ✅ 文字数OK（500-580文字）"
 fi
 echo ""
 
@@ -61,6 +61,22 @@ if [ $BLANK_LINES -lt 3 ]; then
     echo "  ⚠️  空行が少ない（読みやすさに影響）"
 else
     echo "  ✅ 適切な改行あり"
+fi
+echo ""
+
+# 関西弁チェック
+echo "【関西弁チェック】"
+KANSAI_WORDS="やなぁ|やろか|せやけど|やで|あかん|やん|やわ|ちゃう|やっぱり|ええんちゃう|ほんま|せやな|やけど"
+KANSAI_FOUND=$(grep -oE "$KANSAI_WORDS" "$COLUMN_FILE" | head -5)
+if [ -n "$KANSAI_FOUND" ]; then
+    echo "  ❌ 関西弁が検出されました："
+    echo "$KANSAI_FOUND" | while read word; do
+        echo "    - $word"
+    done
+    echo "  ⚠️  注意：「なんやなんや？」は河村様の独特の表現ですが、他の関西弁は使用しないでください。"
+    PASS=false
+else
+    echo "  ✅ 関西弁なし"
 fi
 echo ""
 
